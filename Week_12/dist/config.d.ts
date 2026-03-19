@@ -1,0 +1,20 @@
+export declare const config: {
+    WS_PORT: number;
+    METRICS_PORT: number;
+    JWT_SECRET: string;
+    AUTH_TIMEOUT_MS: number;
+    HEARTBEAT_INTERVAL_MS: number;
+    HEARTBEAT_TIMEOUT_MS: number;
+    RATE_LIMIT_MAX_TOKENS: number;
+    RATE_LIMIT_REFILL_RATE_MS: number;
+    DEK_CACHE_TTL_MS: number;
+    KMS_TIMEOUT_MS: number;
+    KMS_MAX_FAILURES: number;
+    QUEUE_MAX_SIZE: number;
+    QUEUE_BACKPRESSURE_THRESHOLD: number;
+    DB_BATCH_SIZE: number;
+    DB_FLUSH_INTERVAL_MS: number;
+    DB_PATH: string;
+    MAX_PAST_DRIFT_MS: number;
+    MAX_FUTURE_DRIFT_MS: number;
+};
