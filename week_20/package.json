@@ -1,0 +1,20 @@
+{
+  "name": "campus-pulse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CampusPulse real-time event and alert system",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "test": "npm run test --workspace backend && npm run test --workspace frontend",
+    "audit": "npm audit --workspaces"
+  }
+}

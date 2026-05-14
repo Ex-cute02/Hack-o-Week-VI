@@ -1,0 +1,62 @@
+name: CampusPulse CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-build-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Security audit
+        run: npm audit --audit-level=high
+
+      - name: Build frontend
+        run: npm run build --workspace frontend
+
+  rolling-deploy:
+    runs-on: ubuntu-latest
+    needs: test-build-security
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/campuspulse.pem
+          chmod 600 ~/.ssh/campuspulse.pem
+
+      - name: Deploy EC2-1
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/campuspulse.pem ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST_1 }} \
+          'APP_DIR=/opt/campus-pulse BRANCH=main bash /opt/campus-pulse/ops/scripts/deploy-instance.sh'
+
+      - name: Deploy EC2-2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/campuspulse.pem ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST_2 }} \
+          'APP_DIR=/opt/campus-pulse BRANCH=main bash /opt/campus-pulse/ops/scripts/deploy-instance.sh'
+
+      - name: Discord notification
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          curl -H "Content-Type: application/json" \
+            -d "{\"content\":\"CampusPulse deploy status: ${STATUS}\"}" \
+            "${{ secrets.DISCORD_WEBHOOK_URL }}"

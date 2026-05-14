@@ -1,0 +1,17 @@
+config:
+  target: "ws://localhost:4000"
+  phases:
+    - duration: 60
+      arrivalRate: 20
+      rampTo: 200
+  engines:
+    socketio: {}
+
+scenarios:
+  - name: "WebSocket subscribe and alert receive"
+    engine: socketio
+    flow:
+      - emit:
+          channel: "subscribe"
+          data: "campus:global"
+      - think: 2
